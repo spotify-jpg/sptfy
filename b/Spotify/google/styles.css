@@ -1,0 +1,108 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    font-family: Arial, sans-serif;
+}
+
+/* Remover a faixa verde do topo */
+/* body::before { ... } */
+
+.top-banner {
+    width: 100%;
+    background: #39ff14;
+    color: #1a4d1a;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px 0 8px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    position: relative;
+    z-index: 2;
+    padding-top: 48px;
+}
+
+.video-frame {
+    position: relative;
+    margin-top: 24px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-frame video {
+    width: 300px;
+    height: 533px;
+    border: none;
+    border-radius: 24px;
+    background: #000;
+    box-sizing: border-box;
+    display: block;
+}
+
+.clique-btn {
+    background: #39ff14;
+    color: #1a4d1a;
+    font-size: 2.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 24px;
+    padding: 16px 48px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    margin-top: 8px;
+    letter-spacing: 2px;
+    transition: background 0.2s;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.clique-btn:hover {
+    background: #2d7a2d;
+    color: #fff;
+}
+
+.alerta-som {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #39ff14;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 22px 32px 18px 32px;
+    border-radius: 18px;
+    text-align: center;
+    z-index: 5;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+    pointer-events: none;
+    letter-spacing: 1px;
+    min-width: 220px;
+}
+
+.alerta-som .icone-som {
+    font-size: 2.2rem;
+    margin: 10px 0 10px 0;
+    display: block;
+}
+
+.alerta-som .texto-menor {
+    font-size: 1rem;
+    font-weight: normal;
+} 
